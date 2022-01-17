@@ -33,11 +33,22 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // parse command line arguments
-    
+    if (argc == 3) {
+        sInputFilePath = argv[1];
+        sOutputFilePath = argv[2];
+    } else {
+        printf("Enter Input File and Output File Paths")
+    }
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
-    create(*phAudioFile);
-    *pHAudioFile.openFile(sInputFilePath, kFileRead);
+    // set file spec struct
+    stFileSpec.eFormat = CAudioFileIf::kFileFormatWav;
+    stFileSpec.eBitStreamType = CAudioFileIf::kFileBitStreamFloat32;
+    stFileSpec.iNumChannels = 2;
+    stFileSpec.fSampleRateInHz = 44100
+
+    cAudioFileIf::create(phAudioFile);
+    pHAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead, &stFileSpec);
 
     //////////////////////////////////////////////////////////////////////////////
     // open the output text file
@@ -46,12 +57,33 @@ int main(int argc, char* argv[])
     //////////////////////////////////////////////////////////////////////////////
     // allocate memory
     
-    **ppfAudioData 
+    ppfAudioData = new float* [stFileSpec.iNumChannels];
+    for (int i = 0; i < stFileSpec.iNumChannels; i++) {
+        ppfAudioData[i] = new float [kBlockSize];
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // get audio data and write it to the output text file (one column per channel)
 
+    long long int framesRead = kBlockSize;
+    phAudioFile->readData(ppfAudioData, framesRead)
+
+    while (framesRead != 0) {
+        for (int i = 0; i < framesRead; i++) {
+            for (int j = 0; j < stFileSpec.iNumChannels; j++) {
+                hOutputFile << std::to_string(ppfAudioData[j][i]) + " | ";
+            }
+            hOutputFile << "\n";
+        }
+        framesRead = kBlockSize;
+        phAudioFile->readData(ppfAudioData, framesRead)
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
+    hOutputFile.close();
+    phAudioFile->close();
+    cAudioFileIf::destroy(phAudioFile);
 
     // all done
     return 0;
