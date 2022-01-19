@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
         sInputFilePath = argv[1];
         sOutputFilePath = argv[2];
     } else {
-        printf("Enter Input File and Output File Paths")
+        printf("Enter Input File and Output File Paths");
     }
     //////////////////////////////////////////////////////////////////////////////
     // open the input wave file
@@ -45,7 +45,7 @@ int main(int argc, char* argv[])
     stFileSpec.eFormat = CAudioFileIf::kFileFormatWav;
     stFileSpec.eBitStreamType = CAudioFileIf::kFileBitStreamFloat32;
     stFileSpec.iNumChannels = 2;
-    stFileSpec.fSampleRateInHz = 44100
+    stFileSpec.fSampleRateInHz = 44100;
 
     cAudioFileIf::create(phAudioFile);
     pHAudioFile->openFile(sInputFilePath, CAudioFileIf::kFileRead, &stFileSpec);
@@ -66,7 +66,7 @@ int main(int argc, char* argv[])
     // get audio data and write it to the output text file (one column per channel)
 
     long long int framesRead = kBlockSize;
-    phAudioFile->readData(ppfAudioData, framesRead)
+    phAudioFile->readData(ppfAudioData, framesRead);
 
     while (framesRead != 0) {
         for (int i = 0; i < framesRead; i++) {
@@ -81,8 +81,14 @@ int main(int argc, char* argv[])
 
     //////////////////////////////////////////////////////////////////////////////
     // clean-up (close files and free memory)
+
+    for (int i = 0; i < stFileSpec.iNumChannels; i++) {
+        delete [] ppfAudioData[i];
+    }
+    delete ppfAudioData;
+
     hOutputFile.close();
-    phAudioFile->close();
+    phAudioFile->closeFile();
     cAudioFileIf::destroy(phAudioFile);
 
     // all done
